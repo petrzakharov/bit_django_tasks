@@ -14,6 +14,9 @@ class LeadState(models.Model):
         unique=True,
     )
 
+    def __str__(self):
+        return self.name + '_' + str(self.id)
+
 #
 # class Lead(models.Model):
 #     STATUS_FLOW = (

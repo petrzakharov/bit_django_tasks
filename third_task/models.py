@@ -1,26 +1,26 @@
 from django.db import models
 from django.db import transaction
 
-class Deal(models.Model):
-    # user = models.ForeignKey('User', on_delete=models.PROTECT, related_name='deals')
-    # product = models.ForeignKey('Product', on_delete=models.PROTECT, related_name='deals')
-    # publication = models.DateTimeField(auto_now_add=True)
-
-    # Исходный вариант
-    @classmethod
-    def buy(cls, user, item_id):
-        product_qs = Product.objects.filter(item_id=item_id)
-        if product_qs.exists():
-            product = product_qs[0]
-            if product.available:
-                user.withdraw(product.price)
-                send_email_to_user_of_buy_product(user)
-                product.available = False
-                product.buyer = user
-                product.save()
-                return True
-        else:
-            return False
+# class Deal(models.Model):
+#     # user = models.ForeignKey('User', on_delete=models.PROTECT, related_name='deals')
+#     # product = models.ForeignKey('Product', on_delete=models.PROTECT, related_name='deals')
+#     # publication = models.DateTimeField(auto_now_add=True)
+#
+#     # Исходный вариант
+#     @classmethod
+#     def buy(cls, user, item_id):
+#         product_qs = Product.objects.filter(item_id=item_id)
+#         if product_qs.exists():
+#             product = product_qs[0]
+#             if product.available:
+#                 user.withdraw(product.price)
+#                 send_email_to_user_of_buy_product(user)
+#                 product.available = False
+#                 product.buyer = user
+#                 product.save()
+#                 return True
+#         else:
+#             return False
 
 
 """
