@@ -32,6 +32,8 @@ from django.db import transaction
 3. Для операций с покупкой и переводом денег желательно использовать транзакции, это позволит откатить состояние при 
 возникновении непредвиденной ошибки в запросах и сохранить согласованность данных в бд;
 4. Перед вторым return else излишне;
+5. Отправка емейла может быть долгой операцией, ее нужно выполнять в самом конце (иначе товар могут 
+купить 2 раза)
 
 Ниже вариант, как может выглядеть исправленный код:
 
@@ -47,13 +49,12 @@ class Deal2(models.Model):
     @classmethod
     def buy(cls, user, item_id):
         product = Product.objects.filter(item_id=item_id).first()
-        if product:
-            if product.available:
-                with transaction.atomic():
-                    user.withdraw(product.price)
-                    send_email_to_user_of_buy_product(user)
-                    product.available = False
-                    product.buyer = user
-                    product.save()
-                    return True
+        if product and product.available:
+            with transaction.atomic():
+                user.withdraw(product.price)
+                product.available = False
+                product.buyer = user
+                product.save()
+                send_email_to_user_of_buy_product(user)
+                return True
         return False

@@ -59,6 +59,15 @@ class DeliveryState(models.Model):
         return cls.objects.get(pk=cls.STATE_NONE)
 
 
+
+"""
+Общий комментарий:
+Сгенерировать методы без дубликации кода у меня к сожалению не получилось, подозреваю что это необходимо делать через getter/setter.
+Ниже я рассмотрел различные варианты в качестве альтернативных решений;
+"""
+
+
+
 """
  Вариант_1
  Возможно немного упросить код, с помощью вынесения фильтрации в отдельный метод _filering;
@@ -117,24 +126,13 @@ class DeliveryState(models.Model):
 
 """
  Вариант_2
- Использование pk в качестве айди выглядит довольно странным (при удалении/добавлении новой записи, 
- pk может измениться). 
- Добавив поле ModelChoiceField можно избавиться от однообразных методов + в качестве айди статуса будет отдельный
+ Добавив поле ModelChoiceField можно избавиться от однообразных методов и дополнительной модели + в качестве айди 
+ статуса будет 
+ отдельный
  ключ, это упростит код, в тоже время поменяет интерфейс, который предоставляет класс.
 """
 
 # class Delivery(models.Model):
-#     state = models.ForeignKey('DeliveryState', related_name='deliverys', on_delete=models.PROTECT)
-#     address = models.CharField(max_length=1000)
-#
-#     class Meta:
-#         verbose_name = u"Доставка"
-#         verbose_name_plural = u"Доставки"
-#
-# class DeliveryState(models.Model):
-#     class Meta:
-#         verbose_name = u"Состояние доставки"
-#         verbose_name_plural = u"Состояния доставок"
 #
 #     CHOICES = (
 #         ('STATE_NEW', 'New'),
@@ -147,17 +145,21 @@ class DeliveryState(models.Model):
 #         ('STATE_NONE', 'None'),
 #     )
 #
-#     status = models.CharField(max_length=50, choices=CHOICES)
+#     state = models.CharField(max_length=50, choices=CHOICES)
+#     address = models.CharField(max_length=1000)
+#
+#     class Meta:
+#         verbose_name = u"Доставка"
+#         verbose_name_plural = u"Доставки"
+#
 
-#  Тогда фильтрация будет такого вида
-#  Delivery.objects.filter(state__status='STATE_PAID_REFUSED')
 
 """
  Вариант_3
- Можно вынести методы в качестве методов QuerySet'a при редактировании менеджера модели, однако это так же поменять
- интерфейс,
- к стандартному менеджеру модели objects добавим все перечисленные методы,
- получить все отмененные заказы мы сможем например таким образом:
+ Можно вынести методы в качестве методов QuerySet'a при редактировании менеджера модели, однако это так же поменяет
+ интерфейс;
+ К стандартному менеджеру модели objects добавим все перечисленные методы,
+ получить все отмененные заказы мы сможем таким образом:
 """
 
 
@@ -172,7 +174,7 @@ class DeliveryState(models.Model):
 """
 
 
-#
+
 # class DeliveryStateGeneral(models.Model):
 #     class Meta:
 #         verbose_name = u"Состояние доставки"
@@ -187,11 +189,6 @@ class DeliveryState(models.Model):
 #     STATE_COMPLETE = 7  # Завершена
 #     STATE_NONE = 8  # Не определено
 #
-#
-# class DeliveryState(DeliveryStateGeneral):
-#     class Meta:
-#         proxy = True
-#
 #     @classmethod
 #     def get_new(cls):
 #         return cls.objects.get(pk=cls.STATE_NEW)
@@ -203,6 +200,13 @@ class DeliveryState(models.Model):
 #     @classmethod
 #     def get_delivered(cls):
 #         return cls.objects.get(pk=cls.STATE_DELIVERED)
+#
+#
+# class DeliveryState(DeliveryStateGeneral):
+#     class Meta:
+#         proxy = True
+#
+#
 
 """
 Вариант_5
